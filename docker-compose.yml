@@ -1,18 +1,20 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres:15-alpine
+  mariadb:
+    image: mariadb:latest
     ports:
-      - 5432:5432  # enables connecting locally via psql
+      - "3306:3306"
     environment:
-      POSTGRES_DB: webapp_dev
-      POSTGRES_HOST_AUTH_METHOD: trust
+      MYSQL_ROOT_PASSWORD: 17985412
+      MYSQL_DATABASE: stage_upgrade
+      MYSQL_USER: stage_upgrade
+      MYSQL_PASSWORD: password
 
   backend:
     build: .
     depends_on:
-      - postgres
+      - mariadb
     ports:
       - 5000:5000
       - 9229:9229  # debugger port
@@ -22,5 +24,5 @@ services:
       - /usr/src/app/node_modules
     command: pnpm start:docker
     environment:
-      DATABASE_URL: postgres://postgres@postgres/webapp_dev
+      DATABASE_URL: mysql://stage_upgrade:password@mariadb:3306/stage_upgrade
       PORT: 5000
